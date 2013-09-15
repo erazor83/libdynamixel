@@ -87,8 +87,8 @@ typedef struct _dynamixel_backend {
 struct _dynamixel {
     /* Socket or file descriptor */
     int s;
-    int debug;
-    int error_recovery;
+    bool debug;
+    bool error_recovery;
     struct timeval response_timeout;
     struct timeval byte_timeout;
     const dynamixel_backend_t *backend;

@@ -287,7 +287,7 @@ int dynamixel_receive_confirmation(dynamixel_t *ctx, uint8_t *rsp)
 }
 
 
-bool dynamixel_ping(dynamixel_t *ctx, uint8_t id)
+int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id)
 {
     int8_t rc;
     uint8_t req_length;
@@ -302,19 +302,19 @@ bool dynamixel_ping(dynamixel_t *ctx, uint8_t id)
 
         rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
-            return false;
+            return -1;
 
     }
 
-    return false;
+    return -1;
 }
 
 /* Reads the holding registers of remote device and put the data into an
    array */
-int dynamixel_read_registers(dynamixel_t *ctx, int addr, int nb, uint16_t *dest)
+int8_t dynamixel_read_registers(dynamixel_t *ctx, uint8_t id, uint8_t nb, uint16_t *dest)
 {
     //TODO
-    int status;
+    int8_t status;
 
 
     return status;
@@ -325,7 +325,7 @@ void _dynamixel_init_common(dynamixel_t *ctx)
     /* Slave and socket are initialized to -1 */
     ctx->s = -1;
 
-    ctx->debug = FALSE;
+    ctx->debug = false;
     ctx->error_recovery = DYNAMIXEL_ERROR_RECOVERY_NONE;
 
     ctx->response_timeout.tv_sec = 0;
@@ -403,9 +403,9 @@ void dynamixel_free(dynamixel_t *ctx)
     free(ctx);
 }
 
-void dynamixel_set_debug(dynamixel_t *ctx, int boolean)
+void dynamixel_set_debug(dynamixel_t *ctx, bool value)
 {
-    ctx->debug = boolean;
+    ctx->debug = value;
 }
 
 
