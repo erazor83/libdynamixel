@@ -289,8 +289,8 @@ int dynamixel_receive_confirmation(dynamixel_t *ctx, uint8_t *rsp)
 
 bool dynamixel_ping(dynamixel_t *ctx, uint8_t id)
 {
-    int rc;
-    int req_length;
+    int8_t rc;
+    uint8_t req_length;
     uint8_t req[_MIN_REQ_LENGTH];
     uint8_t rsp[MAX_MESSAGE_LENGTH];
 		
@@ -302,14 +302,11 @@ bool dynamixel_ping(dynamixel_t *ctx, uint8_t id)
 
         rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
-            return -1;
-
-
-        offset = ctx->backend->header_length;
+            return false;
 
     }
 
-    return rc;
+    return false;
 }
 
 /* Reads the holding registers of remote device and put the data into an
