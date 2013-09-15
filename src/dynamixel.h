@@ -33,6 +33,8 @@
 #include <time.h>
 #endif
 
+#include <stdbool.h>
+
 #include "config.h"
 
 #include "dynamixel-version.h"
@@ -135,6 +137,7 @@ void dynamixel_set_float(float f, uint16_t *dest);
 
 void dynamixel_close(dynamixel_t *);
 
+bool dynamixel_ping(dynamixel_t *ctx, uint8_t id);
 #include "dynamixel-rtu.h"
 
 DYNAMIXEL_END_DECLS

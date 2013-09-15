@@ -287,8 +287,7 @@ int dynamixel_receive_confirmation(dynamixel_t *ctx, uint8_t *rsp)
 }
 
 
-/* Reads the data from a remove device and put that data into an array */
-static int dynamixel_ping(dynamixel_t *ctx, uint8_t id)
+bool dynamixel_ping(dynamixel_t *ctx, uint8_t id)
 {
     int rc;
     int req_length;
@@ -305,9 +304,6 @@ static int dynamixel_ping(dynamixel_t *ctx, uint8_t id)
         if (rc == -1)
             return -1;
 
-        rc = check_confirmation(ctx, req, rsp, rc);
-        if (rc == -1)
-            return -1;
 
         offset = ctx->backend->header_length;
 

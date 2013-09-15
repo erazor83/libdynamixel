@@ -15,7 +15,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.in ${CMAKE_CURRENT_BINARY_DI
 
 MESSAGE(STATUS "libdynamixel C_FLAGS: ${CMAKE_C_FLAGS}")
 
-ADD_LIBRARY(libdynamixel dynamixel.c dynamixel-rtu.c)
+ADD_LIBRARY(dynamixel dynamixel.c dynamixel-rtu.c)
 
 SET(CMAKE_CXX_FLAGS "-DHAVE_POSIXSERIAL -g -Wall")
 
