@@ -33,6 +33,8 @@
 #include <time.h>
 #endif
 
+#include "config.h"
+
 #include "dynamixel-version.h"
 
 #ifdef  __cplusplus
