@@ -1,25 +1,22 @@
 /*
-* Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
-* Modified for Dynamixel 2013 Alexander Krause <alexander.krause@ed-solutions.de>
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*
-*
-* This library implements the Modbus protocol.
-* http://libdynamixel.org/
-*/
+ * Copyright (C) 2013 Alexander Krause <alexander.krause@ed-solutions.de>
+ * 
+ * Dynamixel library - a fork from libmodbus (http://libmodbus.org)
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include <stdio.h>
 #include <string.h>
@@ -71,8 +68,8 @@ const char *dynamixel_strerror(uint8_t errnum) {
 int8_t _response_malloc(dynamixel_t *ctx, uint8_t size) {
 	if (ctx->response_data) {
 		free(ctx->response_data);
-		ctx->response_data=(uint8_t*)malloc(size);
 	}
+	ctx->response_data=(uint8_t*)malloc(size);
 	return size;
 }
 
@@ -226,7 +223,7 @@ static int receive_msg(dynamixel_t *ctx, uint8_t *msg, msg_type_t msg_type) {
 			return -1;
 		}
 
-		//rc = ctx->backend->recv(ctx, msg + msg_length, length_to_read);
+		rc = ctx->backend->recv(ctx, msg + msg_length, length_to_read);
 		if (rc == 0) {
 			errno = ECONNRESET;
 			rc = -1;
@@ -262,7 +259,7 @@ static int receive_msg(dynamixel_t *ctx, uint8_t *msg, msg_type_t msg_type) {
 			if (frame_start) {
 				//check for 0xff / 0xff and min length
 				if ((msg[0]==0xff) && (msg[1]==0xff)) {
-					length_to_read=3+msg[3];
+					length_to_read=msg[3];
 					frame_start=false;
 				} else {
 					errno=E_DYNAMIXEL_BADDATA;
@@ -352,11 +349,15 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 		if (rc == -1) {
 			return rc;
 		} else {
-			_response_malloc(ctx,rsp[1]);
-			memcpy(ctx->response_data,rsp+3,length-3);
-			*dst=ctx->response_data;
-
-			return length-3;
+			if (rsp[2]!=0) {
+				//dynamixel_error
+				return -rsp[2];
+			} else {
+				_response_malloc(ctx,rsp[1]-2);
+				memcpy(ctx->response_data,rsp+3,rsp[1]-2);
+				*dst=ctx->response_data;
+			}
+			return rsp[1]-2;
 		}
 	}
 
@@ -372,24 +373,16 @@ int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 	uint8_t rsp[MAX_MESSAGE_LENGTH];
 	
 		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, length+3, req);
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
 	req[req_length++]=address;
 	for (rc=0;rc<length;rc++){
 		req[req_length++]=data[rc];
 	}
 
 	rc = send_msg(ctx, req, req_length);
-	if (rc > 0) {
-		int offset;
-		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
-		if (rc == -1) {
-			return rc;
-		} else {
-			return rsp[1];
-		}
-	}
-
-	return -1;
+	return rc;
+	
+	/* there is no response */
 }
 
 
@@ -405,15 +398,21 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** d
 
 	for (cid=start;cid<=end;cid++) {
 		if (ctx->debug) {
-			ping=dynamixel_ping(ctx,cid);
 			fprintf(stderr, "ping % 3i ...",cid);
-			if (ping==1) {
-				ctx->response_data[ret]=cid;
+		}
+		ping=dynamixel_ping(ctx,cid);
+		if (ping==1) {
+			ctx->response_data[ret]=cid;
+			ret++;
+			if (ctx->debug) {
 				printf(" OK\n");
-				ret++;
-			} else if (ping==0) {
+			}
+		} else if (ping==0) {
+			if (ctx->debug) {
 				printf(" TIMEOUT\n");
-			} else {
+			}
+		} else {
+			if (ctx->debug) {
 				printf(" ERROR\n");
 			}
 		}

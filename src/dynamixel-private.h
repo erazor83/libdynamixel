@@ -1,21 +1,23 @@
 /*
-* Copyright © 2010-2012 Ste´phane Raimbault <stephane.raimbault@gmail.com>
-* Modified for Dynamixel 2013 Alexander Krause <alexander.krause@ed-solutions.de>
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+ * Copyright (C) 2013 Alexander Krause <alexander.krause@ed-solutions.de>
+ * 
+ * Dynamixel library - a fork from libmodbus (http://libmodbus.org)
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+
 
 #ifndef _DYNAMIXEL_PRIVATE_H_
 #define _DYNAMIXEL_PRIVATE_H_
@@ -71,8 +73,8 @@ typedef struct _dynamixel_backend {
 	uint8_t checksum_length;
 	uint8_t max_adu_length;
 		
-	int8_t (*build_request_basis) (dynamixel_t *ctx, uint8_t id, uint8_t length,
-																dynamixel_request_t instruction, uint8_t *req);
+	int8_t (*build_request_basis) (dynamixel_t *ctx, uint8_t id, dynamixel_request_t instruction,
+																 uint8_t parameter_count, uint8_t *req);
 	//int8_t (*build_response_basis) (sft_t *sft, uint8_t *rsp);
 	//int8_t (*prepare_response_tid) (const uint8_t *req, int *req_length);
 		

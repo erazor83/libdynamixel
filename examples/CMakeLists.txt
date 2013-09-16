@@ -13,3 +13,10 @@ TARGET_LINK_LIBRARIES(search dynamixel)
 ADD_EXECUTABLE(read_data read_data.c)
 TARGET_LINK_LIBRARIES(read_data dynamixel)
 
+ADD_EXECUTABLE(read_write_data read_write_data.c)
+TARGET_LINK_LIBRARIES(read_write_data dynamixel)
+
+
+ADD_EXECUTABLE(read_write_data2 read_write_data2.c)
+TARGET_LINK_LIBRARIES(read_write_data2 dynamixel)
+

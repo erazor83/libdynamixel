@@ -1,21 +1,22 @@
 /*
-* Copyright © 2001-2011 Ste´phane Raimbault <stephane.raimbault@gmail.com>
-* Modified for Dynamixel 2013 Alexander Krause <alexander.krause@ed-solutions.de>
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or (at your option) any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-*/
+ * Copyright (C) 2013 Alexander Krause <alexander.krause@ed-solutions.de>
+ * 
+ * Dynamixel library - a fork from libmodbus (http://libmodbus.org)
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,8 +48,8 @@ uint8_t gen_checksum(uint8_t* req, uint8_t req_length) {
 }
 
 /* Builds a RTU request header */
-static int8_t _dynamixel_rtu_build_request_basis(dynamixel_t *ctx, uint8_t id, uint8_t parameter_count,
-																dynamixel_request_t instruction, uint8_t *req) {
+static int8_t _dynamixel_rtu_build_request_basis(dynamixel_t *ctx, uint8_t id, dynamixel_request_t instruction, 
+																uint8_t parameter_count, uint8_t *req) {
 	req[0] = 0xff;
 	req[1] = 0xff;
 	req[2] = id;
@@ -154,12 +155,18 @@ static int8_t win32_ser_read(struct win32_ser *ws, uint8_t *p_msg,
 #endif
 
 ssize_t _dynamixel_rtu_send(dynamixel_t *ctx, const uint8_t *req, uint8_t req_length) {
+	ssize_t ret;
+	_dynamixel_rtu_flush(ctx);
 #if defined(_WIN32)
 	dynamixel_rtu_t *ctx_rtu = ctx->backend_data;
 	DWORD n_bytes = 0;
 	return (WriteFile(ctx_rtu->w_ser.fd, req, req_length, &n_bytes, NULL)) ? n_bytes : -1;
 #else
-	return write(ctx->s, req, req_length);
+	ret= write(ctx->s, req, req_length);
+	/*TODO check for empty output queue*/
+	usleep(5000);
+	//tcflush(ctx->s, TCSADRAIN);
+	return ret;
 #endif
 }
 
@@ -170,8 +177,6 @@ ssize_t _dynamixel_rtu_recv(dynamixel_t *ctx, uint8_t *rsp, uint8_t rsp_length) 
 	return read(ctx->s, rsp, rsp_length);
 #endif
 }
-
-int8_t _dynamixel_rtu_flush(dynamixel_t *);
 
 int8_t _dynamixel_rtu_check_integrity(dynamixel_t *ctx, uint8_t *msg,
 																			uint8_t msg_length) {
@@ -587,7 +592,7 @@ static int8_t _dynamixel_rtu_connect(dynamixel_t *ctx) {
 	 */
 
 	/* Raw input */
-	tios.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	tios.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG );
 
 	/* C_IFLAG      Input options
 	 * 
@@ -670,6 +675,8 @@ static int8_t _dynamixel_rtu_connect(dynamixel_t *ctx) {
 	/* Unused because we use open with the NDELAY option */
 	tios.c_cc[VMIN] = 0;
 	tios.c_cc[VTIME] = 0;
+	
+	//tcsetattr(ctx->s, TCSADRAIN, &tios);
 
 	if (tcsetattr(ctx->s, TCSANOW, &tios) < 0) {
 		close(ctx->s);
