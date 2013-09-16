@@ -47,13 +47,13 @@ int main(void) {
 
 				state=dynamixel_read_data(dyn,cid,DYN_CFG_REGISTER,1,&data);
 				if (state>0) {
-					req_data[0]=~req_data[0];
+					req_data[0]=(~req_data[0])&0x01;
 					dynamixel_write_data(dyn,cid,DYN_CFG_REGISTER,1,req_data);
 					printf("Register value: %i\n",data[0]);
 				}
-				req_data[0]=~req_data[0];
-				usleep(10000);
+				usleep(5000);
 			}
+			req_data[0]=~req_data[0];
 		}
 		dynamixel_close(dyn);
 	}
