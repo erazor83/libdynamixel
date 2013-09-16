@@ -11,6 +11,6 @@ TARGET_LINK_LIBRARIES(ping dynamixel)
 ADD_EXECUTABLE(search search.c)
 TARGET_LINK_LIBRARIES(search dynamixel)
 
-ADD_EXECUTABLE(read_data search.c)
+ADD_EXECUTABLE(read_data read_data.c)
 TARGET_LINK_LIBRARIES(read_data dynamixel)
 

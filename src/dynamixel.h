@@ -203,6 +203,7 @@ void dynamixel_close(dynamixel_t *);
 /* dynamixel basic functions */
 int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id);
 int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t length,uint8_t** data);
+int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t length,uint8_t* data);
 
 /* dynamixel abstract functions */
 int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** found_ids);
