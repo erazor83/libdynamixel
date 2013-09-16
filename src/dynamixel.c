@@ -67,6 +67,15 @@ const char *dynamixel_strerror(uint8_t errnum) {
 	}
 }
 
+
+int8_t _response_malloc(dynamixel_t *ctx, uint8_t size) {
+	if (ctx->response_data) {
+		free(ctx->response_data);
+		ctx->response_data=(uint8_t*)malloc(size);
+	}
+	return size;
+}
+
 void _error_print(dynamixel_t *ctx, const char *context) {
 	if (ctx->debug) {
 		fprintf(stderr, "ERROR %s", dynamixel_strerror(errno));
@@ -169,7 +178,7 @@ static int receive_msg(dynamixel_t *ctx, uint8_t *msg, msg_type_t msg_type) {
 	int length_to_read;
 	int msg_length = 0;
 	bool frame_start;
-
+	
 	if (ctx->debug) {
 		if (msg_type == MSG_INDICATION) {
 			printf("Waiting for a indication...\n");
@@ -276,6 +285,12 @@ static int receive_msg(dynamixel_t *ctx, uint8_t *msg, msg_type_t msg_type) {
 	if (ctx->debug) {
 		printf("\n");
 	}
+				
+	/* check_integrity will remove header and checksum from message */
+	/* returning message structure:
+	 * 0xFF 0xFF ID LENGTH INSTRUCTION PARAMETERS CHECKSUM
+	 * ID LENGTH INSTRUCTION PARAMETERS
+	 */
 
 	return ctx->backend->check_integrity(ctx, msg, msg_length);
 }
@@ -321,12 +336,13 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 }
 
 int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
-													 dynamixel_register_t address, uint8_t length,uint8_t** data) {
+													 dynamixel_register_t address, uint8_t length, uint8_t** dst) {
 	int8_t rc;
 	uint8_t req_length;
 	uint8_t req[_MIN_REQ_LENGTH];
 	uint8_t rsp[MAX_MESSAGE_LENGTH];
 		
+
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_READ_DATA, 2, req);
 	req[req_length++]=address;
 	req[req_length++]=length;
@@ -338,13 +354,13 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
-			if (errno==ETIMEDOUT) {
-				return 0;
-			} else {
-				return -1;
-			}
+			return rc;
 		} else {
-			return 1;
+			_response_malloc(ctx,rsp[1]);
+			memcpy(ctx->response_data,rsp+3,length-3);
+			*dst=ctx->response_data;
+
+			return length-3;
 		}
 	}
 
@@ -382,7 +398,8 @@ int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 	return -1;
 }
 
-int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end,uint8_t** found_ids) {
+
+int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** dst) {
 	int8_t ret=0;
 	int8_t ping;
 	uint8_t cid;
@@ -390,17 +407,14 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end,uint8_t** fo
 	ctx->response_timeout.tv_sec = 0;
 	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT_SEARCH;
 
-	if (found_ids!=NULL) {
-		*found_ids = (uint8_t*)malloc(end-start+1);
-	}
+	_response_malloc(ctx,end-start+1);
+
 	for (cid=start;cid<=end;cid++) {
 		if (ctx->debug) {
 			ping=dynamixel_ping(ctx,cid);
 			fprintf(stderr, "ping % 3i ...",cid);
 			if (ping==1) {
-				if (found_ids!=NULL) {
-					(*found_ids)[ret]=cid;
-				}
+				ctx->response_data[ret]=cid;
 				printf(" OK\n");
 				ret++;
 			} else if (ping==0) {
@@ -410,6 +424,7 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end,uint8_t** fo
 			}
 		}
 	}
+	*dst=ctx->response_data;
 	
 	ctx->response_timeout.tv_sec = 0;
 	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
@@ -494,6 +509,10 @@ void dynamixel_free(dynamixel_t *ctx) {
 		return;
 	}
 
+	/*
+	if (ctx->respose_data != NULL) {
+		free(ctx->respose_data);
+	}*/
 	free(ctx->backend_data);
 	free(ctx);
 }

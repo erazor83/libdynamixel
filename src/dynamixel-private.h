@@ -96,6 +96,7 @@ struct _dynamixel {
 	struct timeval byte_timeout;
 	const dynamixel_backend_t *backend;
 	void *backend_data;
+	uint8_t *response_data;
 };
 
 void _dynamixel_init_common(dynamixel_t *ctx);

@@ -173,9 +173,8 @@ ssize_t _dynamixel_rtu_recv(dynamixel_t *ctx, uint8_t *rsp, uint8_t rsp_length) 
 
 int8_t _dynamixel_rtu_flush(dynamixel_t *);
 
-
 int8_t _dynamixel_rtu_check_integrity(dynamixel_t *ctx, uint8_t *msg,
-																const uint8_t msg_length) {
+																			uint8_t msg_length) {
 	uint8_t checksum_calculated;
 	uint8_t checksum_received;
 
@@ -184,6 +183,12 @@ int8_t _dynamixel_rtu_check_integrity(dynamixel_t *ctx, uint8_t *msg,
 
 	/* Check Checksum of msg */
 	if (checksum_calculated == checksum_received) {
+		memmove(
+			msg,
+			msg+_DYNAMIXEL_RTU_HEADER_LENGTH,
+			msg_length-_DYNAMIXEL_RTU_HEADER_LENGTH-_DYNAMIXEL_RTU_CHECKSUM_LENGTH
+		);
+		msg_length=msg_length-_DYNAMIXEL_RTU_HEADER_LENGTH-_DYNAMIXEL_RTU_CHECKSUM_LENGTH;
 		return msg_length;
 	} else {
 		if (ctx->debug) {
