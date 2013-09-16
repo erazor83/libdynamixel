@@ -35,7 +35,7 @@
 
 #include <stdbool.h>
 
-#include "config.h"
+#include <config.h>
 
 #include "dynamixel-version.h"
 
