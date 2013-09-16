@@ -298,27 +298,27 @@ static int8_t _dynamixel_rtu_connect(dynamixel_t *ctx) {
 		case 115200:
 			dcb.BaudRate = CBR_115200;
 			break;
-#if HAVE_BAUDRATE_200000
+#ifdef HAVE_BAUDRATE_200000
 		case 200000:
 			dcb.BaudRate = CBR_200000;
 			break;
 #endif
-#if HAVE_BAUDRATE_250000
+#ifdef HAVE_BAUDRATE_250000
 		case 250000:
 			dcb.BaudRate = CBR_250000;
 			break;
 #endif
-#if HAVE_BAUDRATE_400000
+#ifdef HAVE_BAUDRATE_400000
 		case 400000:
 			dcb.BaudRate = CBR_400000;
 			break;
 #endif
-#if HAVE_BAUDRATE_500000
+#ifdef HAVE_BAUDRATE_500000
 		case 500000:
 			dcb.BaudRate = CBR_500000;
 			break;
 #endif
-#if HAVE_BAUDRATE_1000000
+#ifdef HAVE_BAUDRATE_1000000
 		case 1000000:
 			dcb.BaudRate = CBR_1000000;
 			break;
@@ -454,27 +454,27 @@ static int8_t _dynamixel_rtu_connect(dynamixel_t *ctx) {
 		case 115200:
 			speed = B115200;
 			break;
-#if HAVE_BAUDRATE_200000
+#ifdef HAVE_BAUDRATE_200000
 		case 200000:
 			speed = B200000;
 			break;
 #endif
-#if HAVE_BAUDRATE_250000
+#ifdef HAVE_BAUDRATE_250000
 		case 250000:
 			speed = B250000;
 			break;
 #endif
-#if HAVE_BAUDRATE_400000
+#ifdef HAVE_BAUDRATE_400000
 		case 400000:
 			speed = B400000;
 			break;
 #endif
-#if HAVE_BAUDRATE_500000
+#ifdef HAVE_BAUDRATE_500000
 		case 500000:
 			speed = B500000;
 			break;
 #endif
-#if HAVE_BAUDRATE_1000000
+#ifdef HAVE_BAUDRATE_1000000
 		case 1000000:
 			speed = B1000000;
 			break;
