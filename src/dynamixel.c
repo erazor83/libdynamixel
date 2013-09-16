@@ -315,8 +315,6 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 	rc = send_msg(ctx, req, req_length);
 	if (rc > 0) {
 		int offset;
-		int i;
-
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
 			if (errno==ETIMEDOUT) {
@@ -347,8 +345,6 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	rc = send_msg(ctx, req, req_length);
 	if (rc > 0) {
 		int offset;
-		int i;
-
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
 			return rc;

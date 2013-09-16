@@ -1,8 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(examples C)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_LIST_DIR}/../src)
-#ADD_SUBDIRECTORY(../)
+INCLUDE_DIRECTORIES(../src ${CMAKE_CURRENT_BINARY_DIR}/../src) # second one is for generated config.h
 
 ADD_EXECUTABLE(ping ping.c)
 TARGET_LINK_LIBRARIES(ping dynamixel)
