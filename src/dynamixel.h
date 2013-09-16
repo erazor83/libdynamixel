@@ -130,6 +130,8 @@ int8_t dynamixel_connect(dynamixel_t *ctx);
 void dynamixel_close(dynamixel_t *);
 
 int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id);
+int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** found_ids);
+
 int8_t dynamixel_read_registers(dynamixel_t *ctx, uint8_t id, uint8_t nb, uint16_t *dest);
 
 #include "dynamixel-rtu.h"

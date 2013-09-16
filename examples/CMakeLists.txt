@@ -8,3 +8,6 @@ ADD_EXECUTABLE(ping ping.c)
 TARGET_LINK_LIBRARIES(ping dynamixel)
 
 
+ADD_EXECUTABLE(search search.c)
+TARGET_LINK_LIBRARIES(search dynamixel)
+

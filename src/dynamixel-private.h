@@ -38,8 +38,9 @@ DYNAMIXEL_BEGIN_DECLS
 
 
 /* Timeouts in microsecond (0.5 s) */
-#define _RESPONSE_TIMEOUT    500000
-#define _BYTE_TIMEOUT        500000
+#define _RESPONSE_TIMEOUT_SEARCH	100000
+#define _RESPONSE_TIMEOUT					500000
+#define _BYTE_TIMEOUT							500000
 
 /* request types */
 #define _RQ_PING					0x01

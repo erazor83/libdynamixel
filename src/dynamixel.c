@@ -307,15 +307,52 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
-			return -1;
+			if (errno==ETIMEDOUT) {
+				return 0;
+			} else {
+				return -1;
+			}
 		} else {
-			return 0;
+			return 1;
 		}
 	}
 
 	return -1;
 }
 
+int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end,uint8_t** found_ids) {
+	int8_t ret=0;
+	int8_t ping;
+	uint8_t cid;
+	
+	ctx->response_timeout.tv_sec = 0;
+	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT_SEARCH;
+
+	if (found_ids!=NULL) {
+		*found_ids = (uint8_t*)malloc(end-start+1);
+	}
+	for (cid=start;cid<=end;cid++) {
+		if (ctx->debug) {
+			ping=dynamixel_ping(ctx,cid);
+			fprintf(stderr, "ping % 3i ...",cid);
+			if (ping==1) {
+				if (found_ids!=NULL) {
+					(*found_ids)[ret]=cid;
+				}
+				printf(" OK\n");
+				ret++;
+			} else if (ping==0) {
+				printf(" TIMEOUT\n");
+			} else {
+				printf(" ERROR\n");
+			}
+		}
+	}
+	
+	ctx->response_timeout.tv_sec = 0;
+	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
+	return ret;
+}
 /* Reads the holding registers of remote device and put the data into an
 	array */
 int8_t dynamixel_read_registers(dynamixel_t *ctx, uint8_t id, uint8_t nb, uint16_t *dest) {
