@@ -1,21 +1,21 @@
 /*
- * Copyright Â© 2001-2011 StÃ©phane Raimbault <stephane.raimbault@gmail.com>
- * Modified for Dynamixel 2013 Alexander Krause <alexander.krause@ed-solutions.de>
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- */
+* Copyright © 2001-2011 Ste´phane Raimbault <stephane.raimbault@gmail.com>
+* Modified for Dynamixel 2013 Alexander Krause <alexander.krause@ed-solutions.de>
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or (at your option) any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+*/
 
 #ifndef _DYNAMIXEL_RTU_PRIVATE_H_
 #define _DYNAMIXEL_RTU_PRIVATE_H_
@@ -36,7 +36,7 @@
 #define _DYNAMIXEL_RTU_PRESET_REQ_LENGTH  5
 #define _DYNAMIXEL_RTU_PRESET_RSP_LENGTH  5
 
-#define _DYNAMIXEL_RTU_CHECKSUM_LENGTH    2
+#define _DYNAMIXEL_RTU_CHECKSUM_LENGTH    1
 
 #if defined(_WIN32)
 #define ENOTSUP WSAEOPNOTSUPP
@@ -54,33 +54,34 @@ struct win32_ser {
 #endif /* _WIN32 */
 
 typedef struct _dynamixel_rtu {
-    /* Device: "/dev/ttyS0", "/dev/ttyUSB0" or "/dev/tty.USA19*" on Mac OS X for
-       KeySpan USB<->Serial adapters this string had to be made bigger on OS X
-       as the directory+file name was bigger than 19 bytes. Making it 67 bytes
-       for now, but OS X does support 256 byte file names. May become a problem
-       in the future. */
+	/* Device: "/dev/ttyS0", "/dev/ttyUSB0" or "/dev/tty.USA19*" on Mac OS X for
+	 * KeySpan USB<->Serial adapters this string had to be made bigger on OS X
+	 * as the directory+file name was bigger than 19 bytes. Making it 67 bytes
+	 * for now, but OS X does support 256 byte file names. May become a problem
+	 * in the future.
+	 */
 #if defined(__APPLE_CC__)
-    char device[64];
+	char device[64];
 #else
-    char device[16];
+	char device[64];
 #endif
-    /* Bauds: 9600, 19200, 57600, 115200, etc */
-    uint32_t baud;
-    /* Data bit */
-    uint8_t data_bit;
-    /* Stop bit */
-    uint8_t stop_bit;
-    /* Parity: 'N', 'O', 'E' */
-    char parity;
+	/* Bauds: 9600, 19200, 57600, 115200, etc */
+	uint32_t baud;
+	/* Data bit */
+	uint8_t data_bit;
+	/* Stop bit */
+	uint8_t stop_bit;
+	/* Parity: 'N', 'O', 'E' */
+	char parity;
 #if defined(_WIN32)
-    struct win32_ser w_ser;
-    DCB old_dcb;
+	struct win32_ser w_ser;
+	DCB old_dcb;
 #else
-    /* Save old termios settings */
-    struct termios old_tios;
+	/* Save old termios settings */
+	struct termios old_tios;
 #endif
 #if HAVE_DECL_TIOCSRS485
-    uint8_t serial_mode;
+	uint8_t serial_mode;
 #endif
 } dynamixel_rtu_t;
 
