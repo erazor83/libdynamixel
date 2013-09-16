@@ -43,13 +43,15 @@ DYNAMIXEL_BEGIN_DECLS
 #define _BYTE_TIMEOUT							500000
 
 /* request types */
-#define _RQ_PING					0x01
-#define _RQ_READ_DATA			0x02
-#define _RQ_WRITE_DATA		0x03
-#define _RQ_REG_WRITE			0x04
-#define _RQ_REG_ACTION		0x05
-#define _RQ_RESET					0x06
-#define _RQ_SYNC_WRITE		0x83
+typedef enum {
+	DYNAMIXEL_RQ_PING					=0x01,
+	DYNAMIXEL_RQ_READ_DATA		=0x02,
+	DYNAMIXEL_RQ_WRITE_DATA		=0x03,
+	DYNAMIXEL_RQ_REG_WRITE		=0x04,
+	DYNAMIXEL_RQ_REG_ACTION		=0x05,
+	DYNAMIXEL_RQ_RESET				=0x06,
+	DYNAMIXEL_RQ_SYNC_WRITE		=0x83,
+} dynamixel_request_t;
 
 typedef enum {
 	_DYNAMIXEL_BACKEND_TYPE_RTU=0
@@ -70,7 +72,7 @@ typedef struct _dynamixel_backend {
 	uint8_t max_adu_length;
 		
 	int8_t (*build_request_basis) (dynamixel_t *ctx, uint8_t id, uint8_t length,
-																uint8_t instruction, uint8_t *req);
+																dynamixel_request_t instruction, uint8_t *req);
 	//int8_t (*build_response_basis) (sft_t *sft, uint8_t *rsp);
 	//int8_t (*prepare_response_tid) (const uint8_t *req, int *req_length);
 		

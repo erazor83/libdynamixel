@@ -299,7 +299,7 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 	uint8_t req[_MIN_REQ_LENGTH];
 	uint8_t rsp[MAX_MESSAGE_LENGTH];
 		
-	req_length = ctx->backend->build_request_basis(ctx,id, _RQ_PING, 0, req);
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_PING, 0, req);
 	rc = send_msg(ctx, req, req_length);
 	if (rc > 0) {
 		int offset;
@@ -319,6 +319,38 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 
 	return -1;
 }
+
+int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t length,uint8_t** data) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+	uint8_t rsp[MAX_MESSAGE_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 2, req);
+	req[req_length++]=address;
+	req[req_length++]=length;
+	
+	rc = send_msg(ctx, req, req_length);
+	if (rc > 0) {
+		int offset;
+		int i;
+
+		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
+		if (rc == -1) {
+			if (errno==ETIMEDOUT) {
+				return 0;
+			} else {
+				return -1;
+			}
+		} else {
+			return 1;
+		}
+	}
+
+	return -1;
+}
+
 
 int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end,uint8_t** found_ids) {
 	int8_t ret=0;
