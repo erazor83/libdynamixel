@@ -5,9 +5,9 @@
 #define HAVE_DECL_TIOCSRS485                    @HAVE_TIOCSRS485@
 #define HAVE_DECL_TIOCM_RTS                     @HAVE_TIOCM_RTS@
 
-#cmakedefine HAVE_BAUDRATE_B200000
-#cmakedefine HAVE_BAUDRATE_B200000
-#cmakedefine HAVE_BAUDRATE_B250000
-#cmakedefine HAVE_BAUDRATE_B400000
-#cmakedefine HAVE_BAUDRATE_B500000
-#cmakedefine HAVE_BAUDRATE_B1000000
+#cmakedefine HAVE_BAUDRATE_200000
+#cmakedefine HAVE_BAUDRATE_200000
+#cmakedefine HAVE_BAUDRATE_250000
+#cmakedefine HAVE_BAUDRATE_400000
+#cmakedefine HAVE_BAUDRATE_500000
+#cmakedefine HAVE_BAUDRATE_1000000

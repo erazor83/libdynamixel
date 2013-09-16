@@ -87,7 +87,15 @@ void _error_print(dynamixel_t *ctx, const char *context) {
 	}
 }
 
-int _sleep_and_flush(dynamixel_t *ctx) {
+int8_t dynamixel_flush(dynamixel_t *ctx) {
+	int rc = ctx->backend->flush(ctx);
+	if (rc != -1 && ctx->debug) {
+		printf("%d bytes flushed\n", rc);
+	}
+	return rc;
+}
+
+int8_t _sleep_and_flush(dynamixel_t *ctx) {
 #ifdef _WIN32
 	/* usleep doesn't exist on Windows */
 	Sleep(
@@ -104,14 +112,6 @@ int _sleep_and_flush(dynamixel_t *ctx) {
 	}
 #endif
 	return dynamixel_flush(ctx);
-}
-
-int dynamixel_flush(dynamixel_t *ctx) {
-	int rc = ctx->backend->flush(ctx);
-	if (rc != -1 && ctx->debug) {
-		printf("%d bytes flushed\n", rc);
-	}
-	return rc;
 }
 
 /* Computes the length of the expected response */
@@ -509,10 +509,9 @@ void dynamixel_free(dynamixel_t *ctx) {
 		return;
 	}
 
-	/*
-	if (ctx->respose_data != NULL) {
-		free(ctx->respose_data);
-	}*/
+	if (ctx->response_data != NULL) {
+		free(ctx->response_data);
+	}
 	free(ctx->backend_data);
 	free(ctx);
 }
