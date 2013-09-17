@@ -41,7 +41,8 @@ make
 
 license
 -------------------------
-GPL-2, so no commercial use is allowed
+GNU General Public License, version 2
+
 
 credits
 -------------------------
