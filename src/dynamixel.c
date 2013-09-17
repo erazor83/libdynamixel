@@ -365,6 +365,27 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	return -1;
 }
 
+int8_t dynamixel_action(dynamixel_t *ctx, uint8_t id) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_ACTION, 0, req);
+	rc = send_msg(ctx, req, req_length);
+	
+	return rc;
+}
+
+int8_t dynamixel_reset(dynamixel_t *ctx, uint8_t id) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_RESET, 0, req);
+	rc = send_msg(ctx, req, req_length);
+	
+	return rc;
+}
 
 int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
@@ -374,6 +395,25 @@ int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 	
 		
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
+	req[req_length++]=address;
+	for (rc=0;rc<length;rc++){
+		req[req_length++]=data[rc];
+	}
+
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+	
+	/* there is no response */
+}
+
+int8_t dynamixel_reg_write(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+	
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_WRITE, 1+length, req);
 	req[req_length++]=address;
 	for (rc=0;rc<length;rc++){
 		req[req_length++]=data[rc];
@@ -422,15 +462,6 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** d
 	ctx->response_timeout.tv_sec = 0;
 	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
 	return ret;
-}
-/* Reads the holding registers of remote device and put the data into an
-	array */
-int8_t dynamixel_read_registers(dynamixel_t *ctx, uint8_t id, uint8_t nb, uint16_t *dest) {
-	//TODO
-	int8_t status=-1;
-
-
-	return status;
 }
 
 void _dynamixel_init_common(dynamixel_t *ctx) {

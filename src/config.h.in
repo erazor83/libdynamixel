@@ -11,3 +11,4 @@
 #cmakedefine HAVE_BAUDRATE_400000
 #cmakedefine HAVE_BAUDRATE_500000
 #cmakedefine HAVE_BAUDRATE_1000000
+

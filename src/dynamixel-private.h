@@ -103,6 +103,7 @@ struct _dynamixel {
 
 void _dynamixel_init_common(dynamixel_t *ctx);
 void _error_print(dynamixel_t *ctx, const char *context);
+void dynamixel_free(dynamixel_t *ctx);
 
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dest, const char *src, size_t dest_size);
