@@ -111,6 +111,7 @@ int8_t _sleep_and_flush(dynamixel_t *ctx) {
 	return dynamixel_flush(ctx);
 }
 
+#if 0
 /* Computes the length of the expected response */
 static uint8_t compute_response_length_from_request(dynamixel_t *ctx, uint8_t *req) {
 	const uint8_t offset = ctx->backend->header_length;
@@ -118,6 +119,7 @@ static uint8_t compute_response_length_from_request(dynamixel_t *ctx, uint8_t *r
 
 	return offset + length + ctx->backend->checksum_length;
 }
+#endif
 
 /* Sends a request/response */
 static int send_msg(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
@@ -163,8 +165,9 @@ static int send_msg(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
 	return rc;
 }
 
-int dynamixel_send_raw_request(dynamixel_t *ctx, uint8_t *raw_req, int raw_req_length) {
+int8_t dynamixel_send_raw_request(dynamixel_t *ctx, uint8_t *raw_req, int raw_req_length) {
 	//TODO
+	return 0;
 }
 
 static int receive_msg(dynamixel_t *ctx, uint8_t *msg, msg_type_t msg_type) {
@@ -314,7 +317,6 @@ int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_PING, 0, req);
 	rc = send_msg(ctx, req, req_length);
 	if (rc > 0) {
-		int offset;
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
 			if (errno==ETIMEDOUT) {
@@ -344,7 +346,6 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	
 	rc = send_msg(ctx, req, req_length);
 	if (rc > 0) {
-		int offset;
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
 			return rc;
@@ -370,7 +371,6 @@ int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 	int8_t rc;
 	uint8_t req_length;
 	uint8_t req[_MIN_REQ_LENGTH];
-	uint8_t rsp[MAX_MESSAGE_LENGTH];
 	
 		
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
@@ -427,7 +427,7 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** d
 	array */
 int8_t dynamixel_read_registers(dynamixel_t *ctx, uint8_t id, uint8_t nb, uint16_t *dest) {
 	//TODO
-	int8_t status;
+	int8_t status=-1;
 
 
 	return status;
