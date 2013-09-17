@@ -171,6 +171,8 @@ int dynamixel_set_error_recovery(dynamixel_t *ctx, dynamixel_error_recovery_mode
 #define DYNAMIXEL_ERROR_BIT_6			"Instruction Error "
 #define DYNAMIXEL_ERROR_BIT_7			"0"
 
+
+/* dynamixel core funcions */
 void dynamixel_get_response_timeout(dynamixel_t *ctx, struct timeval *timeout);
 void dynamixel_set_response_timeout(dynamixel_t *ctx, const struct timeval *timeout);
 
@@ -179,20 +181,7 @@ void dynamixel_set_byte_timeout(dynamixel_t *ctx, const struct timeval *timeout)
 
 int8_t dynamixel_get_header_length(dynamixel_t *ctx);
 
-/**
- * UTILS FUNCTIONS
- */
-
-#define DYNAMIXEL_GET_HIGH_BYTE(data) (((data) >> 8) & 0xFF)
-#define DYNAMIXEL_GET_LOW_BYTE(data) ((data) & 0xFF)
-#define DYNAMIXEL_GET_INT32_FROM_INT16(tab_int16, index) ((tab_int16[(index)] << 16) + tab_int16[(index) + 1])
-#define DYNAMIXEL_GET_INT16_FROM_INT8(tab_int8, index) ((tab_int8[(index)] << 8) + tab_int8[(index) + 1])
-#define DYNAMIXEL_SET_INT16_TO_INT8(tab_int8, index, value) \
-	do { \
-		tab_int8[(index)] = (value) >> 8;  \
-		tab_int8[(index) + 1] = (value) & 0xFF; \
-	} while (0)
-
+int8_t dynamixel_set_debug(dynamixel_t *ctx,bool);
 
 int8_t dynamixel_connect(dynamixel_t *ctx);
 void dynamixel_close(dynamixel_t *);
