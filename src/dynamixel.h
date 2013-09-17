@@ -193,12 +193,6 @@ int8_t dynamixel_get_header_length(dynamixel_t *ctx);
 		tab_int8[(index) + 1] = (value) & 0xFF; \
 	} while (0)
 
-void dynamixel_set_bits_from_byte(uint8_t *dest, int index, const uint8_t value);
-void dynamixel_set_bits_from_bytes(uint8_t *dest, int index, unsigned int nb_bits,
-																		const uint8_t *tab_byte);
-uint8_t dynamixel_get_byte_from_bits(const uint8_t *src, int index, unsigned int nb_bits);
-float dynamixel_get_float(const uint16_t *src);
-void dynamixel_set_float(float f, uint16_t *dest);
 
 int8_t dynamixel_connect(dynamixel_t *ctx);
 void dynamixel_close(dynamixel_t *);
