@@ -185,6 +185,7 @@ void dynamixel_set_debug(dynamixel_t *ctx,bool);
 
 int8_t dynamixel_connect(dynamixel_t *ctx);
 void dynamixel_close(dynamixel_t *);
+void dynamixel_free(dynamixel_t *ctx);
 
 /* dynamixel basic functions */
 int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id);
