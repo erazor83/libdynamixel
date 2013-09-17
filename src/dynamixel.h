@@ -181,7 +181,7 @@ void dynamixel_set_byte_timeout(dynamixel_t *ctx, const struct timeval *timeout)
 
 int8_t dynamixel_get_header_length(dynamixel_t *ctx);
 
-int8_t dynamixel_set_debug(dynamixel_t *ctx,bool);
+void dynamixel_set_debug(dynamixel_t *ctx,bool);
 
 int8_t dynamixel_connect(dynamixel_t *ctx);
 void dynamixel_close(dynamixel_t *);
