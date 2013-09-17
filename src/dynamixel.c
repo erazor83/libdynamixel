@@ -476,6 +476,8 @@ void _dynamixel_init_common(dynamixel_t *ctx) {
 
 	ctx->byte_timeout.tv_sec = 0;
 	ctx->byte_timeout.tv_usec = _BYTE_TIMEOUT;
+
+	ctx->response_data = NULL;
 }
 
 
