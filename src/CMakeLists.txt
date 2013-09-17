@@ -25,5 +25,20 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) # for generated config.h
 MESSAGE(STATUS "libdynamixel C_FLAGS: ${CMAKE_C_FLAGS}")
 
 ADD_LIBRARY(dynamixel dynamixel.c dynamixel-rtu.c)
+ADD_LIBRARY(dynamixel_shared SHARED dynamixel.c dynamixel-rtu.c)
 
+
+FIND_PACKAGE(SWIG REQUIRED)
+INCLUDE(${SWIG_USE_FILE})
+
+FIND_PACKAGE(PythonLibs)
+INCLUDE_DIRECTORIES(${PYTHON_INCLUDE_PATH})
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+
+SET(CMAKE_SWIG_FLAGS "-ignoremissing")
+
+SET_SOURCE_FILES_PROPERTIES(dynamixel.i PROPERTIES SWIG_FLAGS "-includeall")
+SWIG_ADD_MODULE(dynamixel python dynamixel.i ${CMAKE_CURRENT_SOURCE_DIR}/dynamixel.c)
+SWIG_LINK_LIBRARIES(dynamixel dynamixel_shared ${PYTHON_LIBRARIES})
 
