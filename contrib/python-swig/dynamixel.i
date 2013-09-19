@@ -10,4 +10,9 @@
 %{
 #include "dynamixel.h"
 %}
+
+%feature("autodoc","1");
+
+
+
 %include "dynamixel.h"

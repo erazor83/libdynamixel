@@ -8,3 +8,4 @@ ADD_SUBDIRECTORY(src)
 #ADD_CUSTOM_TARGET(examples SOURCES examples/CMakeLists.txt)
 ADD_SUBDIRECTORY(examples)
 
+ADD_SUBDIRECTORY(contrib/python-swig)
