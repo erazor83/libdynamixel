@@ -307,6 +307,88 @@ int dynamixel_receive_confirmation(dynamixel_t *ctx, uint8_t *rsp) {
 	return receive_msg(ctx, rsp, MSG_CONFIRMATION);
 }
 
+void _dynamixel_init_common(dynamixel_t *ctx) {
+	/* Slave and socket are initialized to -1 */
+	ctx->s = -1;
+
+	ctx->debug = false;
+	ctx->error_recovery = DYNAMIXEL_ERROR_RECOVERY_NONE;
+
+	ctx->response_timeout.tv_sec = 0;
+	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
+
+	ctx->byte_timeout.tv_sec = 0;
+	ctx->byte_timeout.tv_usec = _BYTE_TIMEOUT;
+
+	ctx->response_data = NULL;
+}
+
+
+int dynamixel_set_error_recovery(dynamixel_t *ctx,
+															dynamixel_error_recovery_mode error_recovery) {
+	/* The type of dynamixel_error_recovery_mode is unsigned enum */
+	ctx->error_recovery = (uint8_t) error_recovery;
+	return 0;
+}
+
+void dynamixel_set_socket(dynamixel_t *ctx, int socket) {
+	ctx->s = socket;
+}
+
+int dynamixel_get_socket(dynamixel_t *ctx) {
+	return ctx->s;
+}
+
+/* Get the timeout interval used to wait for a response */
+void dynamixel_get_response_timeout(dynamixel_t *ctx, struct timeval *timeout) {
+	*timeout = ctx->response_timeout;
+}
+
+void dynamixel_set_response_timeout(dynamixel_t *ctx, const struct timeval *timeout) {
+	ctx->response_timeout = *timeout;
+}
+
+/* Get the timeout interval between two consecutive bytes of a message */
+void dynamixel_get_byte_timeout(dynamixel_t *ctx, struct timeval *timeout) {
+	*timeout = ctx->byte_timeout;
+}
+
+void dynamixel_set_byte_timeout(dynamixel_t *ctx, const struct timeval *timeout) {
+	ctx->byte_timeout = *timeout;
+}
+
+int8_t dynamixel_get_header_length(dynamixel_t *ctx) {
+	return ctx->backend->header_length;
+}
+
+int8_t dynamixel_connect(dynamixel_t *ctx) {
+	return ctx->backend->connect(ctx);
+}
+
+void dynamixel_close(dynamixel_t *ctx) {
+	if (ctx == NULL) {
+		return;
+	}
+
+	ctx->backend->close(ctx);
+}
+
+void dynamixel_free(dynamixel_t *ctx) {
+	if (ctx == NULL) {
+		return;
+	}
+
+	if (ctx->response_data != NULL) {
+		free(ctx->response_data);
+	}
+	free(ctx->backend_data);
+	free(ctx);
+}
+
+void dynamixel_set_debug(dynamixel_t *ctx, bool value) {
+	ctx->debug = value;
+}
+
 
 int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
 	int8_t rc;
@@ -463,127 +545,18 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** d
 	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
 	return ret;
 }
+int8_t dynamixel_reg_write_byte(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data) {
+	//TODO
+}
+int8_t dynamixel_reg_write_word(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data) {
+	//TODO
+}
 
-void _dynamixel_init_common(dynamixel_t *ctx) {
-	/* Slave and socket are initialized to -1 */
-	ctx->s = -1;
-
-	ctx->debug = false;
-	ctx->error_recovery = DYNAMIXEL_ERROR_RECOVERY_NONE;
-
-	ctx->response_timeout.tv_sec = 0;
-	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
-
-	ctx->byte_timeout.tv_sec = 0;
-	ctx->byte_timeout.tv_usec = _BYTE_TIMEOUT;
-
-	ctx->response_data = NULL;
+int8_t dynamixel_reg_write_byte_multi(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data,id_list_t* id_list) {
+	//TODO
+}
+int8_t dynamixel_reg_write_word_multi(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data,id_list_t* id_list) {
+	//TODO
 }
 
 
-int dynamixel_set_error_recovery(dynamixel_t *ctx,
-															dynamixel_error_recovery_mode error_recovery) {
-	/* The type of dynamixel_error_recovery_mode is unsigned enum */
-	ctx->error_recovery = (uint8_t) error_recovery;
-	return 0;
-}
-
-void dynamixel_set_socket(dynamixel_t *ctx, int socket) {
-	ctx->s = socket;
-}
-
-int dynamixel_get_socket(dynamixel_t *ctx) {
-	return ctx->s;
-}
-
-/* Get the timeout interval used to wait for a response */
-void dynamixel_get_response_timeout(dynamixel_t *ctx, struct timeval *timeout) {
-	*timeout = ctx->response_timeout;
-}
-
-void dynamixel_set_response_timeout(dynamixel_t *ctx, const struct timeval *timeout) {
-	ctx->response_timeout = *timeout;
-}
-
-/* Get the timeout interval between two consecutive bytes of a message */
-void dynamixel_get_byte_timeout(dynamixel_t *ctx, struct timeval *timeout) {
-	*timeout = ctx->byte_timeout;
-}
-
-void dynamixel_set_byte_timeout(dynamixel_t *ctx, const struct timeval *timeout) {
-	ctx->byte_timeout = *timeout;
-}
-
-int8_t dynamixel_get_header_length(dynamixel_t *ctx) {
-	return ctx->backend->header_length;
-}
-
-int8_t dynamixel_connect(dynamixel_t *ctx) {
-	return ctx->backend->connect(ctx);
-}
-
-void dynamixel_close(dynamixel_t *ctx) {
-	if (ctx == NULL) {
-		return;
-	}
-
-	ctx->backend->close(ctx);
-}
-
-void dynamixel_free(dynamixel_t *ctx) {
-	if (ctx == NULL) {
-		return;
-	}
-
-	if (ctx->response_data != NULL) {
-		free(ctx->response_data);
-	}
-	free(ctx->backend_data);
-	free(ctx);
-}
-
-void dynamixel_set_debug(dynamixel_t *ctx, bool value) {
-	ctx->debug = value;
-}
-
-
-#ifndef HAVE_STRLCPY
-/*
-* Function strlcpy was originally developed by
-* Todd C. Miller <Todd.Miller@courtesan.com> to simplify writing secure code.
-* See ftp://ftp.openbsd.org/pub/OpenBSD/src/lib/libc/string/strlcpy.3
-* for more information.
-*
-* Thank you Ulrich Drepper... not!
-*
-* Copy src to string dest of size dest_size.  At most dest_size-1 characters
-* will be copied.  Always NUL terminates (unless dest_size == 0).  Returns
-* strlen(src); if retval >= dest_size, truncation occurred.
-*/
-size_t strlcpy(char *dest, const char *src, size_t dest_size) {
-	register char *d = dest;
-	register const char *s = src;
-	register size_t n = dest_size;
-
-	/* Copy as many bytes as will fit */
-	if ((n != 0) && (--n != 0)) {
-		do {
-			if ((*d++ = *s++) == 0) {
-					break;
-			}
-		} while (--n != 0);
-	}
-
-	/* Not enough room in dest, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (dest_size != 0) {
-			*d = '\0'; /* NUL-terminate dest */
-		}
-		while (*s++) {
-				;
-		}
-	}
-
-	return (s - src - 1); /* count does not include NUL */
-}
-#endif
