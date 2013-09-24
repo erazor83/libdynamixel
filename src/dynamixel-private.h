@@ -36,7 +36,7 @@ typedef int ssize_t;
 
 DYNAMIXEL_BEGIN_DECLS
 
-#define _MIN_REQ_LENGTH 7
+#define _MIN_REQ_LENGTH 6
 
 
 /* Timeouts in microsecond (0.5 s) */

@@ -26,6 +26,8 @@
 #include <limits.h>
 #include <time.h>
 
+#include "compat.c"
+
 #include "dynamixel.h"
 #include "dynamixel-private.h"
 
@@ -418,7 +420,7 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 													 dynamixel_register_t address, uint8_t length, uint8_t** dst) {
 	int8_t rc;
 	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
+	uint8_t req[_MIN_REQ_LENGTH+2];
 	uint8_t rsp[MAX_MESSAGE_LENGTH];
 		
 
@@ -473,7 +475,10 @@ int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
 													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
 	int8_t rc;
 	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
+	uint8_t *req;
+	
+	req=malloc(_MIN_REQ_LENGTH+1+length);
+
 	
 		
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
@@ -492,9 +497,9 @@ int8_t dynamixel_reg_write(dynamixel_t *ctx, uint8_t id,
 													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
 	int8_t rc;
 	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
+	uint8_t *req;
 	
-		
+	req=malloc(_MIN_REQ_LENGTH+1+length);
 	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_WRITE, 1+length, req);
 	req[req_length++]=address;
 	for (rc=0;rc<length;rc++){
@@ -545,18 +550,125 @@ int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** d
 	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
 	return ret;
 }
+
 int8_t dynamixel_reg_write_byte(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data) {
-	//TODO
+	//UNTESTED
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH+2];
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 2, req);
+	req[req_length++]=address;
+	req[req_length++]=data;
+	rc = send_msg(ctx, req, req_length);
+	return rc;
 }
 int8_t dynamixel_reg_write_word(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data) {
-	//TODO
+	//UNTESTED
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH+3];
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 3, req);
+	req[req_length++]=address;
+	req[req_length++]=data&0xff;
+	req[req_length++]=(data>>8)&0xff;
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+}
+int8_t dynamixel_sync_write(
+	dynamixel_t *ctx,
+	dynamixel_register_t address,
+	uint8_t id_count,
+	uint8_t parameter_count,
+	uint8_t* data
+) {
+	/*
+	 * data:
+	 *   <dynamixel_id>
+	 *   <parameter>
+	 *   <parameter>
+	 *   <dynamixel_id>
+	 *   <parameter>
+	 *   <parameter>
+	 */
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	
+	uint8_t cID;
+	uint8_t cP;
+	
+	req=malloc(_MIN_REQ_LENGTH+2+(parameter_count+1)*id_count);
+	req_length = ctx->backend->build_request_basis(
+		ctx,
+		DYNAMIXEL_BROADCAST_ADDRESS,
+		DYNAMIXEL_RQ_SYNC_WRITE,
+		2+(parameter_count+1)*id_count,
+		req
+	);
+	/* starting address */
+	req[req_length++]=address;
+	
+	/* count of parameters */
+	req[req_length++]=parameter_count;
+	
+	for (cID=0;cID<id_count;cID++) {
+		/* servo id */
+		req[req_length++]=*(data++);
+		/* parameters */
+		for (cP=0;cP<parameter_count;cP++) {
+			req[req_length++]=*(data++);
+		}
+	}
+	
+	rc = send_msg(ctx, req, req_length);
+	return rc;
 }
 
-int8_t dynamixel_reg_write_byte_multi(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data,id_list_t* id_list) {
-	//TODO
+int8_t dynamixel_sync_write_words(
+	dynamixel_t *ctx,
+	dynamixel_register_t address,
+	uint8_t id_count,
+	uint8_t word_count,
+	uint16_t* data
+) {
+
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	
+	uint8_t cID;
+	uint8_t cW;
+	uint16_t cP;
+	
+	
+	req=malloc(_MIN_REQ_LENGTH+2+(word_count*2+1)*id_count);
+	req_length = ctx->backend->build_request_basis(
+		ctx,
+		DYNAMIXEL_BROADCAST_ADDRESS,
+		DYNAMIXEL_RQ_SYNC_WRITE,
+		2+(word_count*2+1)*id_count,
+		req
+	);
+	/* starting address */
+	req[req_length++]=address;
+	
+	/* count of parameters */
+	req[req_length++]=word_count*2;
+	
+	for (cID=0;cID<id_count;cID++) {
+		/* servo id */
+		req[req_length++]=data[cID*(word_count+1)]&0xff;
+		/* words */
+		for (cW=1;cW<=word_count;cW++) {
+			cP=data[cID*(word_count+1)+cW];
+			req[req_length++]=cP&0xff;
+			req[req_length++]=cP>>8;
+		}
+	}
+	
+	rc = send_msg(ctx, req, req_length);
+	return rc;
 }
-int8_t dynamixel_reg_write_word_multi(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data,id_list_t* id_list) {
-	//TODO
-}
+
 
 
