@@ -593,16 +593,16 @@ int8_t dynamixel_sync_write(
 	int8_t rc;
 	uint8_t req_length;
 	uint8_t *req;
+	uint8_t tmp;
 	
-	uint8_t cID;
-	uint8_t cP;
+	tmp=id_count*(parameter_count+1);
 	
-	req=malloc(_MIN_REQ_LENGTH+2+(parameter_count+1)*id_count);
+	req=malloc(_MIN_REQ_LENGTH+2+tmp);
 	req_length = ctx->backend->build_request_basis(
 		ctx,
 		DYNAMIXEL_BROADCAST_ADDRESS,
 		DYNAMIXEL_RQ_SYNC_WRITE,
-		2+(parameter_count+1)*id_count,
+		2+tmp,
 		req
 	);
 	/* starting address */
@@ -611,14 +611,9 @@ int8_t dynamixel_sync_write(
 	/* count of parameters */
 	req[req_length++]=parameter_count;
 	
-	for (cID=0;cID<id_count;cID++) {
-		/* servo id */
-		req[req_length++]=*(data++);
-		/* parameters */
-		for (cP=0;cP<parameter_count;cP++) {
-			req[req_length++]=*(data++);
-		}
-	}
+	
+	memcpy(req+req_length,data,tmp);
+	req_length+=tmp;
 	
 	rc = send_msg(ctx, req, req_length);
 	return rc;
