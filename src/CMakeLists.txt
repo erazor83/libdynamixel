@@ -30,7 +30,7 @@ IF (WITH_SHARED)
 ENDIF(WITH_SHARED)
 
 
-INSTALL (FILES dynamixel.h ${CMAKE_CURRENT_BINARY_DIR}/dynamixel_config.h
+INSTALL (FILES dynamixel.h dynamixel-version.h ${CMAKE_CURRENT_BINARY_DIR}/dynamixel_config.h
 	DESTINATION include
 )
 INSTALL (TARGETS dynamixel

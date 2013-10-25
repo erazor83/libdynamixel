@@ -41,7 +41,7 @@
 
 #include <dynamixel_config.h>
 
-#include "dynamixel-version.h"
+#include <dynamixel-version.h>
 
 #ifdef  __cplusplus
 # define DYNAMIXEL_BEGIN_DECLS  extern "C" {
@@ -50,8 +50,6 @@
 # define DYNAMIXEL_BEGIN_DECLS
 # define DYNAMIXEL_END_DECLS
 #endif
-
-DYNAMIXEL_BEGIN_DECLS
 
 #ifndef _SWIG
 #define _DYNAMIXEL_SERIAL_DEFAULTS	'N',8,1
@@ -75,6 +73,18 @@ DYNAMIXEL_BEGIN_DECLS
 #define E_DYNAMIXEL_BADEXC 			 3
 #define E_DYNAMIXEL_UNKEXC 			 4
 #define E_DYNAMIXEL_MDATA  			 5
+
+
+#define DYNAMIXEL_ERROR_BIT_0			"Input Voltage Error"
+#define DYNAMIXEL_ERROR_BIT_1			"Angle Limit Error"
+#define DYNAMIXEL_ERROR_BIT_2			"Overheating Error"
+#define DYNAMIXEL_ERROR_BIT_3			"Range Error"
+#define DYNAMIXEL_ERROR_BIT_4			"Checksum Error"
+#define DYNAMIXEL_ERROR_BIT_5			"Overload Error"
+#define DYNAMIXEL_ERROR_BIT_6			"Instruction Error "
+#define DYNAMIXEL_ERROR_BIT_7			"0"
+
+DYNAMIXEL_BEGIN_DECLS
 
 typedef enum {
 #ifdef HAVE_BAUDRATE_1000000
@@ -173,16 +183,6 @@ typedef enum {
 } msg_type_t;
 
 int dynamixel_set_error_recovery(dynamixel_t *ctx, dynamixel_error_recovery_mode error_recovery);
-
-#define DYNAMIXEL_ERROR_BIT_0			"Input Voltage Error"
-#define DYNAMIXEL_ERROR_BIT_1			"Angle Limit Error"
-#define DYNAMIXEL_ERROR_BIT_2			"Overheating Error"
-#define DYNAMIXEL_ERROR_BIT_3			"Range Error"
-#define DYNAMIXEL_ERROR_BIT_4			"Checksum Error"
-#define DYNAMIXEL_ERROR_BIT_5			"Overload Error"
-#define DYNAMIXEL_ERROR_BIT_6			"Instruction Error "
-#define DYNAMIXEL_ERROR_BIT_7			"0"
-
 
 /* dynamixel core funcions */
 void dynamixel_get_response_timeout(dynamixel_t *ctx, struct timeval *timeout);

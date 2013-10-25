@@ -18,38 +18,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#ifndef _MODBUS_VERSION_H_
-#define _MODBUS_VERSION_H_
+#ifndef _DYNAMIXEL_VERSION_H_
+#define _DYNAMIXEL_VERSION_H_
 
-/* The major version, (1, if %LIBMODBUS_VERSION is 1.2.3) */
-#define LIBMODBUS_VERSION_MAJOR (@LIBMODBUS_VERSION_MAJOR@)
+/* The major version, (1, if %LIBDYNAMIXEL_VERSION is 1.2.3) */
+#define LIBDYNAMIXEL_VERSION_MAJOR (@LIBDYNAMIXEL_VERSION_MAJOR@)
 
-/* The minor version (2, if %LIBMODBUS_VERSION is 1.2.3) */
-#define LIBMODBUS_VERSION_MINOR (@LIBMODBUS_VERSION_MINOR@)
+/* The minor version (2, if %LIBDYNAMIXEL_VERSION is 1.2.3) */
+#define LIBDYNAMIXEL_VERSION_MINOR (@LIBDYNAMIXEL_VERSION_MINOR@)
 
-/* The micro version (3, if %LIBMODBUS_VERSION is 1.2.3) */
-#define LIBMODBUS_VERSION_MICRO (@LIBMODBUS_VERSION_MICRO@)
+/* The micro version (3, if %LIBDYNAMIXEL_VERSION is 1.2.3) */
+#define LIBDYNAMIXEL_VERSION_MICRO (@LIBDYNAMIXEL_VERSION_MICRO@)
 
 /* The full version, like 1.2.3 */
-#define LIBMODBUS_VERSION        @LIBMODBUS_VERSION@
+#define LIBDYNAMIXEL_VERSION        @LIBDYNAMIXEL_VERSION@
 
 /* The full version, in string form (suited for string concatenation)
  */
-#define LIBMODBUS_VERSION_STRING "@LIBMODBUS_VERSION@"
+#define LIBDYNAMIXEL_VERSION_STRING "@LIBDYNAMIXEL_VERSION@"
 
 /* Numerically encoded version, like 0x010203 */
-#define LIBMODBUS_VERSION_HEX ((LIBMODBUS_MAJOR_VERSION << 24) |        \
-                               (LIBMODBUS_MINOR_VERSION << 16) |        \
-                               (LIBMODBUS_MICRO_VERSION << 8))
+#define LIBDYNAMIXEL_VERSION_HEX ((LIBDYNAMIXEL_MAJOR_VERSION << 24) |        \
+                               (LIBDYNAMIXEL_MINOR_VERSION << 16) |        \
+                               (LIBDYNAMIXEL_MICRO_VERSION << 8))
 
 /* Evaluates to True if the version is greater than @major, @minor and @micro
  */
-#define LIBMODBUS_VERSION_CHECK(major,minor,micro)      \
-    (LIBMODBUS_VERSION_MAJOR > (major) ||               \
-     (LIBMODBUS_VERSION_MAJOR == (major) &&             \
-      LIBMODBUS_VERSION_MINOR > (minor)) ||             \
-     (LIBMODBUS_VERSION_MAJOR == (major) &&             \
-      LIBMODBUS_VERSION_MINOR == (minor) &&             \
-      LIBMODBUS_VERSION_MICRO >= (micro)))
+#define LIBDYNAMIXEL_VERSION_CHECK(major,minor,micro)      \
+    (LIBDYNAMIXEL_VERSION_MAJOR > (major) ||               \
+     (LIBDYNAMIXEL_VERSION_MAJOR == (major) &&             \
+      LIBDYNAMIXEL_VERSION_MINOR > (minor)) ||             \
+     (LIBDYNAMIXEL_VERSION_MAJOR == (major) &&             \
+      LIBDYNAMIXEL_VERSION_MINOR == (minor) &&             \
+      LIBDYNAMIXEL_VERSION_MICRO >= (micro)))
 
-#endif /* _MODBUS_VERSION_H_ */
+#endif /* _DYNAMIXEL_VERSION_H_ */
