@@ -43,6 +43,7 @@ There are some options to enable different additional features:
   * WITH_SHARED - build shared .so file (libdynamixel_shared.so)
   * WITH_PYTHON_SWIG - build Python-Swig bindings
   * WITH_EXAMPLES - build examples
+  * WITH_TROSSEN - enable Trossen Commander Packages
 
 <pre>
 cmake -DWITH_SHARED=1 .
