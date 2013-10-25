@@ -61,6 +61,8 @@
 #define ON 1
 #endif
 
+DYNAMIXEL_BEGIN_DECLS
+
 #define DYNAMIXEL_MAX_PARAMETER_COUNT  245
 
 #define DYNAMIXEL_BROADCAST_ADDRESS    0xFE
@@ -82,7 +84,6 @@
 #define DYNAMIXEL_ERROR_BIT_6			"Instruction Error "
 #define DYNAMIXEL_ERROR_BIT_7			"0"
 
-DYNAMIXEL_BEGIN_DECLS
 
 typedef enum {
 #ifdef HAVE_BAUDRATE_1000000

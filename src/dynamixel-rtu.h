@@ -20,7 +20,7 @@
 #ifndef _DYNAMIXEL_RTU_H_
 #define _DYNAMIXEL_RTU_H_
 
-#include "dynamixel.h"
+#include <dynamixel.h>
 
 DYNAMIXEL_BEGIN_DECLS
 
