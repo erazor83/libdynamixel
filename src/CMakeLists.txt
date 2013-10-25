@@ -18,7 +18,7 @@ CHECK_SYMBOL_EXISTS(B1000000 "termios.h" HAVE_BAUDRATE_1000000)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/dynamixel_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/dynamixel_config.h)
 
-SET(CMAKE_C_FLAGS "-I -g -Wall")
+SET(CMAKE_C_FLAGS "-I. -I./src/ -g -Wall")
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) # for generated config.h
 
 MESSAGE(STATUS "libdynamixel C_FLAGS: ${CMAKE_C_FLAGS}")
@@ -30,7 +30,7 @@ IF (WITH_SHARED)
 ENDIF(WITH_SHARED)
 
 
-INSTALL (FILES dynamixel.h  ${CMAKE_CURRENT_BINARY_DIR}/dynamixel-version.h ${CMAKE_CURRENT_BINARY_DIR}/dynamixel_config.h
+INSTALL (FILES dynamixel.h  dynamixel-version.h ${CMAKE_CURRENT_BINARY_DIR}/dynamixel_config.h
 	DESTINATION include
 )
 INSTALL (TARGETS dynamixel
