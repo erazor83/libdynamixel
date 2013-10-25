@@ -10,7 +10,7 @@ import time
 
 DYN_CFG_SERVO_ID=1
 
-ctx=dynamixel.dynamixel_t()
+ctx=dynamixel.dynamixel_ctx()
 
 dynamixel.dynamixel_new_rtu(ctx, '/dev/ttyUSB0', 1000000, 'even', 8, 1)
 dynamixel.dynamixel_connect(ctx)

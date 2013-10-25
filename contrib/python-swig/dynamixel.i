@@ -9,10 +9,12 @@
 */
 %{
 #include "dynamixel.h"
+struct dynamixel_t* dynamixel_ctx;
 %}
 
 %feature("autodoc","1");
 
 
 
-%include "dynamixel.h"
+%import "dynamixel.h"
+struct dynamixel_t* dynamixel_ctx;

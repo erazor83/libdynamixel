@@ -26,14 +26,18 @@
 #endif
 
 #ifndef _MSC_VER
+#ifndef _SWIG
 #include <stdint.h>
 #include <sys/time.h>
+#endif
 #else
 #include "stdint.h"
 #include <time.h>
 #endif
 
+#ifndef _SWIG
 #include <stdbool.h>
+#endif
 
 #include <config.h>
 
@@ -49,8 +53,9 @@
 
 DYNAMIXEL_BEGIN_DECLS
 
-
+#ifndef _SWIG
 #define _DYNAMIXEL_SERIAL_DEFAULTS	'N',8,1
+#endif
 
 #ifndef OFF
 #define OFF 0

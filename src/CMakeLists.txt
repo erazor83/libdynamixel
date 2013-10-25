@@ -24,4 +24,9 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) # for generated config.h
 MESSAGE(STATUS "libdynamixel C_FLAGS: ${CMAKE_C_FLAGS}")
 
 ADD_LIBRARY(dynamixel dynamixel.c dynamixel-rtu.c)
-ADD_LIBRARY(dynamixel_shared SHARED dynamixel.c dynamixel-rtu.c)
+
+IF (BUILD_SHARED)
+	ADD_LIBRARY(dynamixel_shared SHARED dynamixel.c dynamixel-rtu.c)
+ENDIF(BUILD_SHARED)
+
+
