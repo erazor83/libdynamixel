@@ -26,6 +26,8 @@
 #include <limits.h>
 #include <time.h>
 
+#include "compat.c"
+
 #include "dynamixel.h"
 #include "dynamixel-private.h"
 
@@ -307,163 +309,6 @@ int dynamixel_receive_confirmation(dynamixel_t *ctx, uint8_t *rsp) {
 	return receive_msg(ctx, rsp, MSG_CONFIRMATION);
 }
 
-
-int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-	uint8_t rsp[MAX_MESSAGE_LENGTH];
-		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_PING, 0, req);
-	rc = send_msg(ctx, req, req_length);
-	if (rc > 0) {
-		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
-		if (rc == -1) {
-			if (errno==ETIMEDOUT) {
-				return 0;
-			} else {
-				return -1;
-			}
-		} else {
-			return 1;
-		}
-	}
-
-	return -1;
-}
-
-int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
-													 dynamixel_register_t address, uint8_t length, uint8_t** dst) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-	uint8_t rsp[MAX_MESSAGE_LENGTH];
-		
-
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_READ_DATA, 2, req);
-	req[req_length++]=address;
-	req[req_length++]=length;
-	
-	rc = send_msg(ctx, req, req_length);
-	if (rc > 0) {
-		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
-		if (rc == -1) {
-			return rc;
-		} else {
-			if (rsp[2]!=0) {
-				//dynamixel_error
-				return -rsp[2];
-			} else {
-				_response_malloc(ctx,rsp[1]-2);
-				memcpy(ctx->response_data,rsp+3,rsp[1]-2);
-				*dst=ctx->response_data;
-			}
-			return rsp[1]-2;
-		}
-	}
-
-	return -1;
-}
-
-int8_t dynamixel_action(dynamixel_t *ctx, uint8_t id) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_ACTION, 0, req);
-	rc = send_msg(ctx, req, req_length);
-	
-	return rc;
-}
-
-int8_t dynamixel_reset(dynamixel_t *ctx, uint8_t id) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_RESET, 0, req);
-	rc = send_msg(ctx, req, req_length);
-	
-	return rc;
-}
-
-int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
-													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-	
-		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
-	req[req_length++]=address;
-	for (rc=0;rc<length;rc++){
-		req[req_length++]=data[rc];
-	}
-
-	rc = send_msg(ctx, req, req_length);
-	return rc;
-	
-	/* there is no response */
-}
-
-int8_t dynamixel_reg_write(dynamixel_t *ctx, uint8_t id,
-													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
-	int8_t rc;
-	uint8_t req_length;
-	uint8_t req[_MIN_REQ_LENGTH];
-	
-		
-	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_WRITE, 1+length, req);
-	req[req_length++]=address;
-	for (rc=0;rc<length;rc++){
-		req[req_length++]=data[rc];
-	}
-
-	rc = send_msg(ctx, req, req_length);
-	return rc;
-	
-	/* there is no response */
-}
-
-
-int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** dst) {
-	int8_t ret=0;
-	int8_t ping;
-	uint8_t cid;
-	
-	ctx->response_timeout.tv_sec = 0;
-	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT_SEARCH;
-
-	_response_malloc(ctx,end-start+1);
-
-	for (cid=start;cid<=end;cid++) {
-		if (ctx->debug) {
-			fprintf(stderr, "ping % 3i ...",cid);
-		}
-		ping=dynamixel_ping(ctx,cid);
-		if (ping==1) {
-			ctx->response_data[ret]=cid;
-			ret++;
-			if (ctx->debug) {
-				printf(" OK\n");
-			}
-		} else if (ping==0) {
-			if (ctx->debug) {
-				printf(" TIMEOUT\n");
-			}
-		} else {
-			if (ctx->debug) {
-				printf(" ERROR\n");
-			}
-		}
-	}
-	*dst=ctx->response_data;
-	
-	ctx->response_timeout.tv_sec = 0;
-	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
-	return ret;
-}
-
 void _dynamixel_init_common(dynamixel_t *ctx) {
 	/* Slave and socket are initialized to -1 */
 	ctx->s = -1;
@@ -547,43 +392,278 @@ void dynamixel_set_debug(dynamixel_t *ctx, bool value) {
 }
 
 
-#ifndef HAVE_STRLCPY
-/*
-* Function strlcpy was originally developed by
-* Todd C. Miller <Todd.Miller@courtesan.com> to simplify writing secure code.
-* See ftp://ftp.openbsd.org/pub/OpenBSD/src/lib/libc/string/strlcpy.3
-* for more information.
-*
-* Thank you Ulrich Drepper... not!
-*
-* Copy src to string dest of size dest_size.  At most dest_size-1 characters
-* will be copied.  Always NUL terminates (unless dest_size == 0).  Returns
-* strlen(src); if retval >= dest_size, truncation occurred.
-*/
-size_t strlcpy(char *dest, const char *src, size_t dest_size) {
-	register char *d = dest;
-	register const char *s = src;
-	register size_t n = dest_size;
-
-	/* Copy as many bytes as will fit */
-	if ((n != 0) && (--n != 0)) {
-		do {
-			if ((*d++ = *s++) == 0) {
-					break;
+int8_t dynamixel_ping(dynamixel_t *ctx, uint8_t id) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+	uint8_t rsp[MAX_MESSAGE_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_PING, 0, req);
+	rc = send_msg(ctx, req, req_length);
+	if (rc > 0) {
+		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
+		if (rc == -1) {
+			if (errno==ETIMEDOUT) {
+				return 0;
+			} else {
+				return -1;
 			}
-		} while (--n != 0);
-	}
-
-	/* Not enough room in dest, add NUL and traverse rest of src */
-	if (n == 0) {
-		if (dest_size != 0) {
-			*d = '\0'; /* NUL-terminate dest */
-		}
-		while (*s++) {
-				;
+		} else {
+			return 1;
 		}
 	}
 
-	return (s - src - 1); /* count does not include NUL */
+	return -1;
 }
-#endif
+
+int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t length, uint8_t** dst) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH+2];
+	uint8_t rsp[MAX_MESSAGE_LENGTH];
+		
+
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_READ_DATA, 2, req);
+	req[req_length++]=address;
+	req[req_length++]=length;
+	
+	rc = send_msg(ctx, req, req_length);
+	if (rc > 0) {
+		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
+		if (rc == -1) {
+			return rc;
+		} else {
+			if (rsp[2]!=0) {
+				//dynamixel_error
+				return -rsp[2];
+			} else {
+				_response_malloc(ctx,rsp[1]-2);
+				memcpy(ctx->response_data,rsp+3,rsp[1]-2);
+				*dst=ctx->response_data;
+			}
+			return rsp[1]-2;
+		}
+	}
+
+	return -1;
+}
+
+int8_t dynamixel_action(dynamixel_t *ctx, uint8_t id) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_ACTION, 0, req);
+	rc = send_msg(ctx, req, req_length);
+	
+	return rc;
+}
+
+int8_t dynamixel_reset(dynamixel_t *ctx, uint8_t id) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH];
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_RESET, 0, req);
+	rc = send_msg(ctx, req, req_length);
+	
+	return rc;
+}
+
+int8_t dynamixel_write_data(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	
+	req=malloc(_MIN_REQ_LENGTH+1+length);
+
+	
+		
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 1+length, req);
+	req[req_length++]=address;
+	for (rc=0;rc<length;rc++){
+		req[req_length++]=data[rc];
+	}
+
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+	
+	/* there is no response */
+}
+
+int8_t dynamixel_reg_write(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t length,uint8_t* data) {
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	
+	req=malloc(_MIN_REQ_LENGTH+1+length);
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_REG_WRITE, 1+length, req);
+	req[req_length++]=address;
+	for (rc=0;rc<length;rc++){
+		req[req_length++]=data[rc];
+	}
+
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+	
+	/* there is no response */
+}
+
+
+int8_t dynamixel_search(dynamixel_t *ctx, uint8_t start,uint8_t end, uint8_t** dst) {
+	int8_t ret=0;
+	int8_t ping;
+	uint8_t cid;
+	
+	ctx->response_timeout.tv_sec = 0;
+	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT_SEARCH;
+
+	_response_malloc(ctx,end-start+1);
+
+	for (cid=start;cid<=end;cid++) {
+		if (ctx->debug) {
+			fprintf(stderr, "ping % 3i ...",cid);
+		}
+		ping=dynamixel_ping(ctx,cid);
+		if (ping==1) {
+			ctx->response_data[ret]=cid;
+			ret++;
+			if (ctx->debug) {
+				printf(" OK\n");
+			}
+		} else if (ping==0) {
+			if (ctx->debug) {
+				printf(" TIMEOUT\n");
+			}
+		} else {
+			if (ctx->debug) {
+				printf(" ERROR\n");
+			}
+		}
+	}
+	*dst=ctx->response_data;
+	
+	ctx->response_timeout.tv_sec = 0;
+	ctx->response_timeout.tv_usec = _RESPONSE_TIMEOUT;
+	return ret;
+}
+
+int8_t dynamixel_reg_write_byte(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data) {
+	//UNTESTED
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH+2];
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 2, req);
+	req[req_length++]=address;
+	req[req_length++]=data;
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+}
+int8_t dynamixel_reg_write_word(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data) {
+	//UNTESTED
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t req[_MIN_REQ_LENGTH+3];
+	req_length = ctx->backend->build_request_basis(ctx,id, DYNAMIXEL_RQ_WRITE_DATA, 3, req);
+	req[req_length++]=address;
+	req[req_length++]=data&0xff;
+	req[req_length++]=(data>>8)&0xff;
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+}
+int8_t dynamixel_sync_write(
+	dynamixel_t *ctx,
+	dynamixel_register_t address,
+	uint8_t id_count,
+	uint8_t parameter_count,
+	uint8_t* data
+) {
+	/*
+	 * data:
+	 *   <dynamixel_id>
+	 *   <parameter>
+	 *   <parameter>
+	 *   <dynamixel_id>
+	 *   <parameter>
+	 *   <parameter>
+	 */
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	uint8_t tmp;
+	
+	tmp=id_count*(parameter_count+1);
+	
+	req=malloc(_MIN_REQ_LENGTH+2+tmp);
+	req_length = ctx->backend->build_request_basis(
+		ctx,
+		DYNAMIXEL_BROADCAST_ADDRESS,
+		DYNAMIXEL_RQ_SYNC_WRITE,
+		2+tmp,
+		req
+	);
+	/* starting address */
+	req[req_length++]=address;
+	
+	/* count of parameters */
+	req[req_length++]=parameter_count;
+	
+	
+	memcpy(req+req_length,data,tmp);
+	req_length+=tmp;
+	
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+}
+
+int8_t dynamixel_sync_write_words(
+	dynamixel_t *ctx,
+	dynamixel_register_t address,
+	uint8_t id_count,
+	uint8_t word_count,
+	uint16_t* data
+) {
+
+	int8_t rc;
+	uint8_t req_length;
+	uint8_t *req;
+	
+	uint8_t cID;
+	uint8_t cW;
+	uint16_t cP;
+	
+	
+	req=malloc(_MIN_REQ_LENGTH+2+(word_count*2+1)*id_count);
+	req_length = ctx->backend->build_request_basis(
+		ctx,
+		DYNAMIXEL_BROADCAST_ADDRESS,
+		DYNAMIXEL_RQ_SYNC_WRITE,
+		2+(word_count*2+1)*id_count,
+		req
+	);
+	/* starting address */
+	req[req_length++]=address;
+	
+	/* count of parameters */
+	req[req_length++]=word_count*2;
+	
+	for (cID=0;cID<id_count;cID++) {
+		/* servo id */
+		req[req_length++]=data[cID*(word_count+1)]&0xff;
+		/* words */
+		for (cW=1;cW<=word_count;cW++) {
+			cP=data[cID*(word_count+1)+cW];
+			req[req_length++]=cP&0xff;
+			req[req_length++]=cP>>8;
+		}
+	}
+	
+	rc = send_msg(ctx, req, req_length);
+	return rc;
+}
+
+
+

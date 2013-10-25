@@ -20,3 +20,9 @@ TARGET_LINK_LIBRARIES(read_write_data dynamixel)
 ADD_EXECUTABLE(read_write_data2 read_write_data2.c)
 TARGET_LINK_LIBRARIES(read_write_data2 dynamixel)
 
+ADD_EXECUTABLE(write_sync write_sync.c)
+TARGET_LINK_LIBRARIES(write_sync dynamixel)
+
+ADD_EXECUTABLE(write_sync_words write_sync_words.c)
+TARGET_LINK_LIBRARIES(write_sync_words dynamixel)
+
