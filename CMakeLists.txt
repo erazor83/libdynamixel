@@ -14,11 +14,4 @@ IF (WITH_PYTHONSWIG)
 	ADD_SUBDIRECTORY(contrib/python-swig)
 ENDIF (WITH_PYTHONSWIG)
 
-INSTALL (FILES src/dynamixel.h DESTINATION include)
-INSTALL (FILES src/libdynamixel.a DESTINATION lib)
-
-IF (WITH_SHARED)
-	INSTALL (FILES src/libdynamixel_shared.so DESTINATION lib)
-ENDIF (WITH_SHARED)
-
 
