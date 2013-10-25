@@ -41,8 +41,6 @@
 
 #include <dynamixel_config.h>
 
-#include <dynamixel-version.h>
-
 #ifdef  __cplusplus
 # define DYNAMIXEL_BEGIN_DECLS  extern "C" {
 # define DYNAMIXEL_END_DECLS    }
