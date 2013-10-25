@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #endif
 
-#include <config.h>
+#include <dynamixel_config.h>
 
 #include "dynamixel-version.h"
 
@@ -249,7 +249,21 @@ int8_t dynamixel_sync_write_words(
 	uint8_t word_count,
 	uint16_t* data
 );
-#include "dynamixel-rtu.h"
+
+
+/* advanced non dynamixel commands */
+#ifdef TROSSEN_CMD_SUPPORT
+typedef struct Trossen_Commander_Data{
+	int8_t	right_V;
+	int8_t	right_H;
+	int8_t	left_V;
+	int8_t	left_H;
+	uint8_t	buttons;
+} trossen_cmd_t;
+
+int8_t dynamixel_adv_trossen_cmd(dynamixel_t*, trossen_cmd_t*);
+
+#endif
 
 DYNAMIXEL_END_DECLS
 

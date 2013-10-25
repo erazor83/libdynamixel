@@ -167,6 +167,47 @@ static int send_msg(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
 	return rc;
 }
 
+static int send_msg_raw(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
+	int rc;
+	int i;
+
+	if (ctx->debug) {
+		for (i = 0; i < msg_length; i++){
+			printf("[%.2X]", msg[i]);
+		}
+		printf("\n");
+	}
+
+	/* In recovery mode, the write command will be issued until to be
+	 * successful! Disabled by default.
+	 */
+	do {
+		rc = ctx->backend->send(ctx, msg, msg_length);
+		if (rc == -1) {
+			_error_print(ctx, NULL);
+			if (ctx->error_recovery & DYNAMIXEL_ERROR_RECOVERY_LINK) {
+				int saved_errno = errno;
+
+				if ((errno == EBADF || errno == ECONNRESET || errno == EPIPE)) {
+					dynamixel_close(ctx);
+					dynamixel_connect(ctx);
+				} else {
+					_sleep_and_flush(ctx);
+				}
+				errno = saved_errno;
+			}
+		}
+	} while ((ctx->error_recovery & DYNAMIXEL_ERROR_RECOVERY_LINK) &&
+						rc == -1);
+
+	if (rc > 0 && rc != msg_length) {
+		errno = E_DYNAMIXEL_MDATA;
+		return -1;
+	}
+
+	return rc;
+}
+
 int8_t dynamixel_send_raw_request(dynamixel_t *ctx, uint8_t *raw_req, int raw_req_length) {
 	//TODO
 	return 0;
@@ -665,5 +706,25 @@ int8_t dynamixel_sync_write_words(
 	return rc;
 }
 
+#ifdef TROSSEN_CMD_SUPPORT
+int8_t dynamixel_adv_trossen_cmd(dynamixel_t *ctx,trossen_cmd_t* command) {
+	uint8_t req[8];
+	int8_t rc;
+	
+	req[0]=0xff;
+	req[1]=command->right_V;
+	req[2]=command->right_H;
+	req[3]=command->left_V;
+	req[4]=command->left_H;
+	req[5]=command->buttons;
+	req[6]=0;
+	for (rc=1;rc<6;rc++) {
+		req[7]+=req[rc];
+	}
+	req[7]=~req[7];
+	
+	rc = send_msg_raw(ctx, req, 8);
+	return rc;
+}
 
-
+#endif
