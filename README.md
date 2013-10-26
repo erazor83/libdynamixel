@@ -23,7 +23,7 @@ Thanks again to Stéphane Raimbault from http://libmodbus.org who allowed me to 
 supported interfaces
 -------------------------
   * [USB2AX](http://xevelabs.com/doku.php?id=product:usb2ax:usb2ax)
-  * [m16u4-dev(using xevelabs firmware)](http://ed-solutions.de/dokuwiki/hardware:misc:m16u4:dev)
+  * [m16u4-dev (using xevelabs firmware)](http://ed-solutions.de/dokuwiki/hardware:misc:m16u4:dev)
 
 
 install
