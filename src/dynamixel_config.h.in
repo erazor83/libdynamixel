@@ -2,10 +2,10 @@
 #define LIBDYNAMIXEL_VERSION_MINOR              @LIBDYNAMIXEL_VERSION_MINOR@
 #define LIBDYNAMIXEL_VERSION_MICRO              @LIBDYNAMIXEL_VERSION_MICRO@
 
-#cmakedefine HAVE_DECL_TIOCSRS485                    @HAVE_TIOCSRS485@
-#cmakedefine HAVE_DECL_TIOCM_RTS                     @HAVE_TIOCM_RTS@
+#cmakedefine HAVE_DECL_TIOCSRS485
+#cmakedefine HAVE_DECL_TIOCM_RTS
 
-#cmakedefine TROSSEN_CMD_SUPPORT                     @TROSSEN_CMD_SUPPORT@
+#cmakedefine TROSSEN_CMD_SUPPORT                @TROSSEN_CMD_SUPPORT@
 
 #cmakedefine HAVE_BAUDRATE_200000
 #cmakedefine HAVE_BAUDRATE_200000
