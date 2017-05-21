@@ -17,6 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
+
 #ifndef _DYNAMIXEL_H_
 #define _DYNAMIXEL_H_
 
@@ -236,6 +237,7 @@ int8_t dynamixel_sync_write(
 int8_t dynamixel_reg_write_byte(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t data);
 int8_t dynamixel_reg_write_word(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint16_t data);
 
+//int8_t dynamixel_reg_read_byte(dynamixel_t *ctx, uint8_t id, dynamixel_register_t address, uint8_t* data);
 
 
 /* dynamixel abstract functions */

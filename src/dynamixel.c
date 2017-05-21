@@ -167,6 +167,7 @@ static int send_msg(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
 	return rc;
 }
 
+#ifdef TROSSEN_CMD_SUPPORT
 static int send_msg_raw(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
 	int rc;
 	int i;
@@ -207,6 +208,7 @@ static int send_msg_raw(dynamixel_t *ctx, uint8_t *msg, int msg_length) {
 
 	return rc;
 }
+#endif
 
 int8_t dynamixel_send_raw_request(dynamixel_t *ctx, uint8_t *raw_req, int raw_req_length) {
 	//TODO
@@ -488,6 +490,18 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	}
 
 	return -1;
+}
+
+int8_t dynamixel_reg_read_byte(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t* dst) {
+
+	return dynamixel_read_data(
+		ctx,
+		id,
+		address,
+		1,
+		(uint8_t **)dst
+	);
 }
 
 int8_t dynamixel_action(dynamixel_t *ctx, uint8_t id) {
