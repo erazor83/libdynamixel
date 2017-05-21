@@ -6,15 +6,15 @@ setup.py file for libdynamixel bindings.
 
 from distutils.core import setup,Extension
 
-libdynamixel_module = Extension('_libdynamixel',
+dynamixel_module = Extension('_dynamixel',
 	libraries=['dynamixel_shared'],
 	sources=['dynamixel_wrap.c'],
 	)
 
-setup (name = 'libdynamixel',
-	version = '0.1.0',
+setup (name = 'dynamixel',
+	version = '0.1.1',
 	author = "Alexander Krause",
 	description = """Simple libdynamixel bindings.""",
-	ext_modules = [libdynamixel_module],
-	py_modules = ["libdynamixel"],
+	ext_modules = [dynamixel_module],
+	py_modules = ["dynamixel"],
 )
