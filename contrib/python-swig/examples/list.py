@@ -15,10 +15,10 @@ ctx=dynamixel.dynamixel_new_rtu('/dev/ttyACM0', 1000000, 'E', 8, 1)
 con=dynamixel.dynamixel_connect(ctx)
 
 if con==0:
-
-	while 1:
-		ping=dynamixel.dynamixel_ping(ctx,DYN_CFG_SERVO_ID)
-		print(ping)
-		time.sleep(1)
-	#print values[0]
-	#print retval
+	for i in range(0,255):
+		ping=dynamixel.dynamixel_ping(
+			ctx,
+			i
+		)
+		if ping:
+			print(i,ping)

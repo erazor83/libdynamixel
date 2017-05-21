@@ -15,10 +15,17 @@ ctx=dynamixel.dynamixel_new_rtu('/dev/ttyACM0', 1000000, 'E', 8, 1)
 con=dynamixel.dynamixel_connect(ctx)
 
 if con==0:
-
-	while 1:
-		ping=dynamixel.dynamixel_ping(ctx,DYN_CFG_SERVO_ID)
-		print(ping)
-		time.sleep(1)
-	#print values[0]
-	#print retval
+	while True:
+		for v in [0,1]:
+			for i in range(0,18):
+				ping=dynamixel.dynamixel_write_data(
+					ctx,
+					i,
+					dynamixel.DYNAMIXEL_R_LED,
+					[v]
+				)
+				
+				print("%i=%i"%(i,v),ping)
+				time.sleep(0.01)
+			#print values[0]
+			#print retval
