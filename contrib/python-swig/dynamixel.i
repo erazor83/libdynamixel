@@ -9,12 +9,12 @@
 */
 %{
 #define SWIG_FILE_WITH_INIT
-#include "dynamixel.h"
+#include "../../src/dynamixel.h"
 typedef struct dynamixel_t* dynamixel_ctx;
 %}
 
 %feature("autodoc","1");
 
 
-%import "dynamixel.h"
+%include "../../src/dynamixel.h"
 typedef struct dynamixel_t* dynamixel_ctx;
