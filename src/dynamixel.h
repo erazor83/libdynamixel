@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Alexander Krause <alexander.krause@ed-solutions.de>
+ * Copyright (C) 2017 Alexander Krause <alexander.krause@ed-solutions.de>
  * 
  * Dynamixel library - a fork from libmodbus (http://libmodbus.org)
  * 
@@ -26,7 +26,7 @@
 #endif
 
 #ifndef _MSC_VER
-#ifndef _SWIG
+#ifndef SWIG
 #include <stdint.h>
 #include <sys/time.h>
 #endif
@@ -35,7 +35,7 @@
 #include <time.h>
 #endif
 
-#ifndef _SWIG
+#ifndef SWIG
 #include <stdbool.h>
 #endif
 
@@ -49,7 +49,7 @@
 # define DYNAMIXEL_END_DECLS
 #endif
 
-#ifndef _SWIG
+#ifndef SWIG
 #define _DYNAMIXEL_SERIAL_DEFAULTS	'N',8,1
 #endif
 
