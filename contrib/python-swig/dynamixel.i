@@ -52,14 +52,15 @@
 	PyObject *values;
 
 	values=PyList_New($1);
-
-	if (*$2) {
+	//printf("dst %p / %p\n",(void*)$2,(void*)*$2);
+	if ($2 && *$2) {
+		//printf("good pointer\n");
 		for (w=0;w<$1;w++) {
 			PyList_SetItem(values,w,PyInt_FromLong((long) (*$2)[w]));
 		}
+		%append_output(values);
 	}
 	free($2);
-	%append_output(values);
 }
 
 %typemap(argout) (dynamixel_register_t address, uint8_t* dst) {

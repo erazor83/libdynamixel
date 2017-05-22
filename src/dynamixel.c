@@ -475,6 +475,7 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	if (rc > 0) {
 		rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
 		if (rc == -1) {
+			*dst=NULL;
 			return rc;
 		} else {
 			if (rsp[2]!=0) {
@@ -492,15 +493,32 @@ int8_t dynamixel_read_data(dynamixel_t *ctx, uint8_t id,
 	return -1;
 }
 
-int8_t dynamixel_reg_read_byte(dynamixel_t *ctx, uint8_t id,
-													 dynamixel_register_t address, uint8_t* dst) {
+int8_t dynamixel_read_response(dynamixel_t *ctx, uint8_t length, uint8_t** dst) {
+	int8_t rc;
+	uint8_t rsp[MAX_MESSAGE_LENGTH];
+		
 
+	rc = receive_msg(ctx, rsp, MSG_CONFIRMATION);
+	if (rc == -1) {
+		return rc;
+	} else {
+		_response_malloc(ctx,rsp[1]-2);
+		memcpy(ctx->response_data,rsp+3,rsp[1]-2);
+		*dst=ctx->response_data;
+		return rsp[1]-2;
+	}
+
+	return -1;
+}
+
+int8_t dynamixel_read_byte(dynamixel_t *ctx, uint8_t id,
+													 dynamixel_register_t address, uint8_t* dst) {
 	return dynamixel_read_data(
 		ctx,
 		id,
 		address,
 		1,
-		(uint8_t **)dst
+		(uint8_t **)&dst
 	);
 }
 
