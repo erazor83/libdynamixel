@@ -43,8 +43,7 @@
 
 %typemap(in,numinputs=1) (uint8_t length,uint8_t** dst) {
 	$1 = PyInt_AsLong($input)&0xff;
-	uint8_t* tmp;
-	$2 = &tmp;
+	$2 = (uint8_t**)malloc(sizeof(uint8_t*));
 }
 
 %typemap(argout) (uint8_t length, uint8_t** dst) {
@@ -54,13 +53,21 @@
 
 	values=PyList_New($1);
 
-	for (w=0;w<$1;w++) {
-		PyList_SetItem(values,w,PyInt_FromLong((long) (*$2)[w]));
+	if (*$2) {
+		for (w=0;w<$1;w++) {
+			PyList_SetItem(values,w,PyInt_FromLong((long) (*$2)[w]));
+		}
 	}
-	
+	free($2);
 	%append_output(values);
 }
 
+%typemap(argout) (dynamixel_register_t address, uint8_t* dst) {
+	%append_output(PyInt_FromLong((long) $2[0]));
+}
+%typemap(argout) (dynamixel_register_t address, uint16_t* dst) {
+	%append_output(PyInt_FromLong((long) $2[0]));
+}
 
 %{
 #define SWIG_FILE_WITH_INIT
